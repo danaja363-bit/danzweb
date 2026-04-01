@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>DANZ OFC - Streaming Film Gratis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(180deg, #000 0%, #0a0a0a 100%);
+            padding: 20px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #333;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #e50914, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            background: #1a1a1a;
+            padding: 8px 15px;
+            border-radius: 30px;
+            border: 1px solid #333;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            padding: 8px;
+            width: 250px;
+            outline: none;
+        }
+
+        .search-box button {
+            background: #e50914;
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* MAIN */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* CATEGORY TABS */
+        .category-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 10px 25px;
+            border-radius: 30px;
+            color: #fff;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #e50914;
+            border-color: #e50914;
+        }
+
+        /* MOVIE GRID */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .movie-card {
+            background: #111;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+            border: 1px solid #222;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-8px);
+            border-color: #e50914;
+        }
+
+        .movie-poster {
+            width: 100%;
+            aspect-ratio: 2/3;
+            background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #e50914;
+        }
+
+        .movie-info {
+            padding: 12px;
+        }
+
+        .movie-title {
+            font-weight: bold;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .movie-year {
+            color: #888;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* MODAL PLAYER */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            width: 90%;
+            max-width: 1000px;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #e50914;
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            background: #111;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: #e50914;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .movie-detail {
+            padding: 20px;
+            background: #111;
+        }
+
+        .movie-detail p {
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid #222;
+            color: #666;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .movie-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            .search-box input {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo" onclick="location.reload()">🎬 DANZ<span style="color:#e50914;">OFC</span></div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Cari film...">
+                <button onclick="searchMovies()">Cari</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="category-tabs">
+            <button class="tab-btn active" onclick="switchCategory('popular')">🔥 POPULER</button>
+            <button class="tab-btn" onclick="switchCategory('action')">⚡ ACTION</button>
+            <button class="tab-btn" onclick="switchCategory('comedy')">😂 KOMEDI</button>
+            <button class="tab-btn" onclick="switchCategory('horror')">😱 HOROR</button>
+            <button class="tab-btn" onclick="switchCategory('indonesia')">🇮🇩 INDONESIA</button>
+        </div>
+        <div class="movie-grid" id="movieGrid"></div>
+    </div>
+
+    <div class="footer">
+        <p>🎬 <strong>DANZ OFC</strong> - Streaming Film Gratis | Klik film untuk nonton</p>
+        <p>⚠️ Konten dari sumber embed publik | 100% Aman</p>
+    </div>
+
+    <!-- MODAL -->
+    <div id="movieModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Judul Film</h3>
+                <button class="close-modal" onclick="closeModal()">×</button>
+            </div>
+            <div class="video-container">
+                <iframe id="movieIframe" src="" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="movie-detail">
+                <p id="modalSynopsis"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== DATABASE FILM (NO API NEEDED!) ====================
+        const movies = {
+            popular: [
+                { title: "Dune: Part Two", year: 2024, embed: "https://vidsrc.me/embed/movie/693134", synopsis: "Petualangan Paul Atreides di planet Arrakis berlanjut." },
+                { title: "Oppenheimer", year: 2023, embed: "https://vidsrc.me/embed/movie/872585", synopsis: "Kisah pencipta bom atom, J. Robert Oppenheimer." },
+                { title: "Spider-Man: Across the Spider-Verse", year: 2023, embed: "https://vidsrc.me/embed/movie/569094", synopsis: "Miles Morales bertualang melintasi multiverse." },
+                { title: "John Wick: Chapter 4", year: 2023, embed: "https://vidsrc.me/embed/movie/603692", synopsis: "John Wick kembali berburu di seluruh dunia." },
+                { title: "The Batman", year: 2022, embed: "https://vidsrc.me/embed/movie/414906", synopsis: "Batman muda mengungkap korupsi di Gotham." },
+                { title: "Top Gun: Maverick", year: 2022, embed: "https://vidsrc.me/embed/movie/361743", synopsis: "Pete Mitchell kembali melatih generasi baru pilot." }
+            ],
+            action: [
+                { title: "Mission: Impossible - Dead Reckoning", year: 2023, embed: "https://vidsrc.me/embed/movie/575264", synopsis: "Ethan Hunt menghadapi musuh terbaru: AI." },
+                { title: "Fast X", year: 2023, embed: "https://vidsrc.me/embed/movie/385687", synopsis: "Dom Toretto dan keluarga menghadapi Dante." },
+                { title: "The Equalizer 3", year: 2023, embed: "https://vidsrc.me/embed/movie/926393", synopsis: "Robert McCall menemukan kedamaian di Italia." },
+                { title: "Extraction 2", year: 2023, embed: "https://vidsrc.me/embed/movie/697843", synopsis: "Tyler Rake kembali misi penyelamatan berbahaya." },
+                { title: "Kill Bill: Vol. 1", year: 2003, embed: "https://vidsrc.me/embed/movie/24", synopsis: "The Bride memburu mantan bosnya." }
+            ],
+            comedy: [
+                { title: "Barbie", year: 2023, embed: "https://vidsrc.me/embed/movie/346698", synopsis: "Barbie dan Ken berpetualang di dunia nyata." },
+                { title: "The Super Mario Bros. Movie", year: 2023, embed: "https://vidsrc.me/embed/movie/502356", synopsis: "Mario dan Luigi menyelamatkan Princess Peach." },
+                { title: "No Hard Feelings", year: 2023, embed: "https://vidsrc.me/embed/movie/884605", synopsis: "Seorang wanita direkrut untuk mengencani remaja." },
+                { title: "Anyone But You", year: 2023, embed: "https://vidsrc.me/embed/movie/1072790", synopsis: "Komedi romantis di Australia." }
+            ],
+            horror: [
+                { title: "The Nun II", year: 2023, embed: "https://vidsrc.me/embed/movie/893723", synopsis: "Suster Irene menghadapi Valak di Prancis." },
+                { title: "Five Nights at Freddy's", year: 2023, embed: "https://vidsrc.me/embed/movie/1003579", synopsis: "Penjaga keamanan di restoran animatronik." },
+                { title: "Insidious: The Red Door", year: 2023, embed: "https://vidsrc.me/embed/movie/614409", synopsis: "Keluarga Lambert kembali menghadapi The Further." },
+                { title: "Saw X", year: 2023, embed: "https://vidsrc.me/embed/movie/951491", synopsis: "John Kramer melakukan misi pribadi di Meksiko." }
+            ],
+            indonesia: [
+                { title: "KKN di Desa Penari", year: 2022, embed: "https://vidsrc.me/embed/movie/790001", synopsis: "Mahasiswa KKN mengalami kejadian mistis." },
+                { title: "Pengabdi Setan 2", year: 2022, embed: "https://vidsrc.me/embed/movie/828764", synopsis: "Rini dan keluarga pindah ke rumah susah." },
+                { title: "Qodrat", year: 2022, embed: "https://vidsrc.me/embed/movie/1011679", synopsis: "Ustadz Qodrat melawan jin di pondok pesantren." },
+                { title: "Miracle in Cell No. 7", year: 2022, embed: "https://vidsrc.me/embed/movie/839713", synopsis: "Adaptasi Indonesia dari film Korea." },
+                { title: "Sri Asih", year: 2022, embed: "https://vidsrc.me/embed/movie/799143", synopsis: "Superhero wanita Indonesia pertama." },
+                { title: "Takut", year: 2023, embed: "https://vidsrc.me/embed/movie/1146971", synopsis: "Kisah horor di panti asuhan." }
+            ]
+        };
+
+        let currentCategory = 'popular';
+
+        function renderMovies(category) {
+            const grid = document.getElementById('movieGrid');
+            const movieList = movies[category] || movies.popular;
+            
+            grid.innerHTML = movieList.map(movie => `
+                <div class="movie-card" onclick="playMovie('${movie.embed}', '${movie.title}', '${movie.synopsis}')">
+                    <div class="movie-poster">🎬</div>
+                    <div class="movie-info">
+                        <div class="movie-title">${movie.title}</div>
+                        <div class="movie-year">${movie.year}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function switchCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderMovies(category);
+        }
+
+        function searchMovies() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!query) {
+                renderMovies(currentCategory);
+                return;
+            }
+
+            const allMovies = [...movies.popular, ...movies.action, ...movies.comedy, ...movies.horror, ...movies.indonesia];
+            const results = allMovies.filter(m => m.title.toLowerCase().includes(query));
+            
+            const grid = document.getElementById('movieGrid');
+            if (results.length > 0) {
+                grid.innerHTML = results.map(movie => `
+                    <div class="movie-card" onclick="playMovie('${movie.embed}', '${movie.title}', '${movie.synopsis}')">
+                        <div class="movie-poster">🎬</div>
+                        <div class="movie-info">
+                            <div class="movie-title">${movie.title}</div>
+                            <div class="movie-year">${movie.year}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                grid.innerHTML = '<p style="color:#888; text-align:center; grid-column:1/-1;">😢 Film tidak ditemukan. Coba kata kunci lain!</p>';
+            }
+        }
+
+        function playMovie(embedUrl, title, synopsis) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalSynopsis').innerHTML = `<strong>📝 Sinopsis:</strong> ${synopsis}`;
+            document.getElementById('movieIframe').src = embedUrl;
+            document.getElementById('movieModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('movieModal').classList.remove('active');
+            document.getElementById('movieIframe').src = '';
+        }
+
+        // Search enter
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchMovies();
+        });
+
+        // ESC close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // INIT
+        renderMovies('popular');
+    </script>
+</body>
+</html>
